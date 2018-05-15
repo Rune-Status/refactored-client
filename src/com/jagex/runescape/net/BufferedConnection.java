@@ -1,24 +1,24 @@
 package com.jagex.runescape.net;
 
+import com.jagex.runescape.GameShell;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.jagex.runescape.GameShell;
-
 public class BufferedConnection implements Runnable {
 
-	private final InputStream inputStream;
-	private final OutputStream outputStream;
-	private final Socket socket;
-	private boolean closed = false;
-	protected GameShell gameStub;
-	private byte[] buffer;
-	private int writerPosition;
-	private int bufferPosition;
-	private boolean writing = false;
-	private boolean ioError = false;
+	public InputStream inputStream;
+	public OutputStream outputStream;
+	public Socket socket;
+	public boolean closed = false;
+	public GameShell gameStub;
+	public byte[] buffer;
+	public int writerPosition;
+	public int bufferPosition;
+	public boolean writing = false;
+	public boolean ioError = false;
 
 	public BufferedConnection(GameShell gameStub, Socket socket) throws IOException {
 		this.gameStub = gameStub;
@@ -32,111 +32,100 @@ public class BufferedConnection implements Runnable {
 	public void close() {
 		closed = true;
 		try {
-			if (inputStream != null) {
+			if (inputStream != null)
 				inputStream.close();
-			}
-			if (outputStream != null) {
+			if (outputStream != null)
 				outputStream.close();
-			}
-			if (socket != null) {
+			if (socket != null)
 				socket.close();
-			}
-		} catch (IOException ioexception) {
+		} catch (IOException _ex) {
 			System.out.println("Error closing stream");
 		}
 		writing = false;
 		synchronized (this) {
-			this.notify();
+			notify();
 		}
 		buffer = null;
 	}
 
 	public int read() throws IOException {
-		if (closed == true) {
+		if (closed)
 			return 0;
-		}
-		return inputStream.read();
+		else
+			return inputStream.read();
 	}
 
 	public int getAvailable() throws IOException {
-		if (closed == true) {
+		if (closed)
 			return 0;
-		}
-		return inputStream.available();
+		else
+			return inputStream.available();
 	}
 
 	public void read(byte[] src, int offset, int length) throws IOException {
-		if (closed != true) {
+		if (!closed) {
 			int byteRead;
-			for (/**/; length > 0; length -= byteRead) {
+			for (; length > 0; length -= byteRead) {
 				byteRead = inputStream.read(src, offset, length);
-				if (byteRead <= 0) {
+				if (byteRead <= 0)
 					throw new IOException("EOF");
-				}
 				offset += byteRead;
 			}
 		}
 	}
 
-	public void write(int length, byte[] src, int offset) throws IOException {
-		if (closed != true) {
-			if (ioError) {
-				ioError = false;
-				throw new IOException("Error in writer thread");
+	public void write(int length, int offset, byte[] src) throws IOException {
+		if (closed)
+			return;
+		if (ioError) {
+			ioError = false;
+			throw new IOException("Error in writer thread");
+		}
+		if (buffer == null)
+			buffer = new byte[5000];
+		synchronized (this) {
+			for (int position = 0; position < length; position++) {
+				buffer[bufferPosition] = src[position + offset];
+				bufferPosition = (bufferPosition + 1) % 5000;
+				if (bufferPosition == (writerPosition + 4900) % 5000)
+					throw new IOException("buffer overflow");
 			}
-			if (buffer == null) {
-				buffer = new byte[5000];
+
+			if (!writing) {
+				writing = true;
+				gameStub.startRunnable(this, 3);
 			}
-			synchronized (this) {
-				for (int position = 0; position < length; position++) {
-					buffer[bufferPosition] = src[position + offset];
-					bufferPosition = (bufferPosition + 1) % 5000;
-					if (bufferPosition == (writerPosition + 4900) % 5000) {
-						throw new IOException("buffer overflow");
-					}
-				}
-				if (writing == false) {
-					writing = true;
-					gameStub.startRunnable(this, 3);
-				}
-				this.notify();
-			}
+			notify();
 		}
 	}
 
-	@Override
 	public void run() {
-		while (writing == true) {
+		while (writing) {
 			int writerLength;
 			synchronized (this) {
-				if (bufferPosition == writerPosition) {
+				if (bufferPosition == writerPosition)
 					try {
-						this.wait();
-					} catch (InterruptedException interruptedexception) {
-						/* empty */
+						wait();
+					} catch (InterruptedException _ex) {
 					}
-				}
-				if (writing == false) {
-					break;
-				}
-				if (bufferPosition >= writerPosition) {
+				if (!writing)
+					return;
+				if (bufferPosition >= writerPosition)
 					writerLength = bufferPosition - writerPosition;
-				} else {
+				else
 					writerLength = 5000 - writerPosition;
-				}
 			}
 			if (writerLength > 0) {
 				try {
 					outputStream.write(buffer, writerPosition, writerLength);
-				} catch (IOException ioexception) {
+				} catch (IOException _ex) {
 					ioError = true;
 				}
 				writerPosition = (writerPosition + writerLength) % 5000;
 				try {
-					if (bufferPosition == writerPosition) {
+					if (bufferPosition == writerPosition)
 						outputStream.flush();
-					}
-				} catch (IOException ioexception) {
+				} catch (IOException _ex) {
 					ioError = true;
 				}
 			}
@@ -151,7 +140,8 @@ public class BufferedConnection implements Runnable {
 		System.out.println("ioerror:" + ioError);
 		try {
 			System.out.println("available:" + getAvailable());
-		} catch (IOException ioexception) {
+		} catch (IOException _ex) {
 		}
 	}
+
 }

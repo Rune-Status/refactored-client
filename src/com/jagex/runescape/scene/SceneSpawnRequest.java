@@ -3,18 +3,19 @@ package com.jagex.runescape.scene;
 import com.jagex.runescape.media.renderable.Renderable;
 
 public class SceneSpawnRequest {
-	protected int anInt597;
-	protected int anInt598;
-	protected int anInt599;
-	protected int anInt600;
+
+	public int anInt113;
+	public int anInt114;
+	public int anInt115;
+	public int anInt116;
 	public Renderable aRenderable601;
-	public int anInt602;
-	protected int x;
-	protected int anInt604;
-	protected int y;
-	protected int anInt606;
-	protected int anInt607;
-	protected int anInt608;
-	public int anInt609;
-	protected byte config;
+	public int anInt118;
+	public int x;
+	public int anInt120;
+	public int y;
+	public int anInt122;
+	public int anInt123;
+	public int anInt124;
+	public int anInt125;
+	public byte config;
 }

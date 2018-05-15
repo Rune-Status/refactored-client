@@ -1,30 +1,23 @@
 package com.jagex.runescape.scene;
 
-/* SceneCluster - Decompiled by JODE
- * Visit http://jode.sourceforge.net/
- */
-
 public class SceneCluster {
-	protected int anInt579;
-	protected int anInt580;
-	protected int anInt581;
-	protected int anInt582;
-	protected int anInt583;
-	protected int anInt584;
-	protected int anInt585;
-	protected int anInt586;
-	protected int anInt587;
-	protected int anInt588;
-	protected int anInt589;
-	protected int anInt590;
-	protected int anInt591;
-	protected int anInt592;
-	protected int anInt593;
-	protected int anInt594;
-	protected int anInt595;
-	protected int anInt596;
 
-	SceneCluster() {
-		/* empty */
-	}
+	public int anInt675;
+	public int anInt676;
+	public int anInt677;
+	public int anInt678;
+	public int anInt679;
+	public int anInt680;
+	public int anInt681;
+	public int anInt682;
+	public int anInt683;
+	public int anInt684;
+	public int anInt685;
+	public int anInt686;
+	public int anInt687;
+	public int anInt688;
+	public int anInt689;
+	public int anInt690;
+	public int anInt691;
+	public int anInt692;
 }

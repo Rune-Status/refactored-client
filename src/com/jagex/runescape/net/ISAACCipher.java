@@ -1,6 +1,7 @@
 package com.jagex.runescape.net;
 
-public final class ISAACCipher {
+public class ISAACCipher {
+
 
 	/**
 	 * The golden ratio.
@@ -63,7 +64,7 @@ public final class ISAACCipher {
 
 	/**
 	 * Creates the random number generator with the specified seed.
-	 * 
+	 *
 	 * @param seed
 	 *            The seed.
 	 */
@@ -138,7 +139,7 @@ public final class ISAACCipher {
 
 	/**
 	 * Initialises this random number generator.
-	 * 
+	 *
 	 * @param flag
 	 *            Set to {@code true} if a seed was passed to the constructor.
 	 */
@@ -273,7 +274,7 @@ public final class ISAACCipher {
 
 	/**
 	 * Gets the next random value.
-	 * 
+	 *
 	 * @return The next random value.
 	 */
 	public int nextInt() {

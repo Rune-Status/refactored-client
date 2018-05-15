@@ -2,7 +2,7 @@ package com.jagex.runescape.net.requester;
 
 public class Requester {
 
-	public void request(int id) {
-
+	public void requestModel(int model) {
 	}
+	
 }

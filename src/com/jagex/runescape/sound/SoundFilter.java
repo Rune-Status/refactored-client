@@ -1,74 +1,76 @@
 package com.jagex.runescape.sound;
 
 import com.jagex.runescape.net.Buffer;
+import com.jagex.runescape.sound.SoundTrackEnvelope;
 
 public class SoundFilter {
 
-	protected int[] numPairs = new int[2];
-	protected int[][][] pairPhase = new int[2][2][4];
-	protected int[][][] magnitude = new int[2][2][4];
-	protected int[] unity = new int[2];
-	static float[][] _coefficient = new float[2][8];
-	static int[][] coefficient = new int[2][8];
-	static float _invUnity;
-	static int invUnity;
+	public int[] numPairs = new int[2];
+	public int[][][] pairPhase = new int[2][2][4];
+	public int[][][] magnitude = new int[2][2][4];
+	public int[] unity = new int[2];
+	public static float[][] _coefficient = new float[2][8];
+	public static int[][] coefficient = new int[2][8];
+	public static float _invUnity;
+	public static int invUnity;
 
-	private float adaptMagnitude(int dir, int i, float f) {
-		float alpha = magnitude[dir][0][i] + f * (magnitude[dir][1][i] - magnitude[dir][0][i]);
-		alpha *= 0.0015258789F;
-		return 1.0F - (float) Math.pow(10.0, -alpha / 20.0F);
+	public float adaptMagnitude(int i, float f, int dir) {
+		float alpha = magnitude[i][0][dir] + f
+				* (magnitude[i][1][dir] - magnitude[i][0][dir]);
+		alpha *= 0.001525879F;
+		return 1.0F - (float) Math.pow(10D, -alpha / 20F);
 	}
 
-	private float normalize(float f) {
-		float f_2_ = 32.703197F * (float) Math.pow(2.0, f);
-		return f_2_ * 3.1415927F / 11025.0F;
+	public float normalize(float f) {
+		float f1 = 32.7032F * (float) Math.pow(2D, f);
+		return (f1 * 3.141593F) / 11025F;
 	}
 
-	private float adaptPhase(int dir, float f, int i) {
-		float f_4_ = pairPhase[dir][0][i] + f * (pairPhase[dir][1][i] - pairPhase[dir][0][i]);
-		f_4_ *= 1.2207031E-4F;
-		return normalize(f_4_);
+	public float adaptPhase(int i, int dir, float f) {
+		float f1 = pairPhase[dir][0][i] + f
+				* (pairPhase[dir][1][i] - pairPhase[dir][0][i]);
+		f1 *= 0.0001220703F;
+		return normalize(f1);
 	}
 
 	public int compute(int dir, float f) {
 		if (dir == 0) {
-			float f_6_ = unity[0] + (unity[1] - unity[0]) * f;
-			f_6_ *= 0.0030517578F;
-			SoundFilter._invUnity = (float) Math.pow(0.1, f_6_ / 20.0F);
-			SoundFilter.invUnity = (int) (SoundFilter._invUnity * 65536.0F);
+			float f1 = unity[0] + (unity[1] - unity[0]) * f;
+			f1 *= 0.003051758F;
+			_invUnity = (float) Math.pow(0.10000000000000001D, f1 / 20F);
+			invUnity = (int) (_invUnity * 65536F);
 		}
-		if (numPairs[dir] == 0) {
+		if (numPairs[dir] == 0)
 			return 0;
-		}
-		float f_7_ = adaptMagnitude(dir, 0, f);
-		SoundFilter._coefficient[dir][0] = -2.0F * f_7_ * (float) Math.cos(adaptPhase(dir, f, 0));
-		SoundFilter._coefficient[dir][1] = f_7_ * f_7_;
+		float f2 = adaptMagnitude(dir, f, 0);
+		_coefficient[dir][0] = -2F * f2 * (float) Math.cos(adaptPhase(0, dir, f));
+		_coefficient[dir][1] = f2 * f2;
 		for (int term = 1; term < numPairs[dir]; term++) {
-			f_7_ = adaptMagnitude(dir, term, f);
-			float f_9_ = -2.0F * f_7_ * (float) Math.cos(adaptPhase(dir, f, term));
-			float f_10_ = f_7_ * f_7_;
-			SoundFilter._coefficient[dir][term * 2 + 1] = SoundFilter._coefficient[dir][term * 2 - 1] * f_10_;
-			SoundFilter._coefficient[dir][term * 2] = SoundFilter._coefficient[dir][term * 2 - 1] * f_9_
-					+ SoundFilter._coefficient[dir][term * 2 - 2] * f_10_;
-			for (int i = term * 2 - 1; i >= 2; i--) {
-				SoundFilter._coefficient[dir][i] += SoundFilter._coefficient[dir][i - 1] * f_9_
-						+ SoundFilter._coefficient[dir][i - 2] * f_10_;
-			}
-			SoundFilter._coefficient[dir][1] += SoundFilter._coefficient[dir][0] * f_9_ + f_10_;
-			SoundFilter._coefficient[dir][0] += f_9_;
+			float f3 = adaptMagnitude(dir, f, term);
+			float f4 = -2F * f3 * (float) Math.cos(adaptPhase(term, dir, f));
+			float f5 = f3 * f3;
+			_coefficient[dir][term * 2 + 1] = _coefficient[dir][term * 2 - 1] * f5;
+			_coefficient[dir][term * 2] = _coefficient[dir][term * 2 - 1] * f4 + _coefficient[dir][term * 2 - 2]
+					* f5;
+			for (int i = term * 2 - 1; i >= 2; i--)
+				_coefficient[dir][i] += _coefficient[dir][i - 1] * f4 + _coefficient[dir][i - 2] * f5;
+
+			_coefficient[dir][1] += _coefficient[dir][0] * f4 + f5;
+			_coefficient[dir][0] += f4;
 		}
+
 		if (dir == 0) {
-			for (int i = 0; i < numPairs[0] * 2; i++) {
-				SoundFilter._coefficient[0][i] *= SoundFilter._invUnity;
-			}
+			for (int l = 0; l < numPairs[0] * 2; l++)
+				_coefficient[0][l] *= _invUnity;
+
 		}
-		for (int term = 0; term < numPairs[dir] * 2; term++) {
-			SoundFilter.coefficient[dir][term] = (int) (SoundFilter._coefficient[dir][term] * 65536.0F);
-		}
+		for (int term = 0; term < numPairs[dir] * 2; term++)
+			coefficient[dir][term] = (int) (_coefficient[dir][term] * 65536F);
+
 		return numPairs[dir] * 2;
 	}
 
-	public final void decode(Buffer buffer, boolean bool, SoundTrackEnvelope soundtrackenvelope) {
+	public void decode(SoundTrackEnvelope soundTrackEnvelope, Buffer buffer) {
 		int numPair = buffer.getUnsignedByte();
 		numPairs[0] = numPair >> 4;
 		numPairs[1] = numPair & 0xf;
@@ -81,9 +83,11 @@ public class SoundFilter {
 					pairPhase[dir][0][term] = buffer.getUnsignedLEShort();
 					magnitude[dir][0][term] = buffer.getUnsignedLEShort();
 				}
+
 			}
+
 			for (int dir = 0; dir < 2; dir++) {
-				for (int term = 0; term < numPairs[dir]; term++) {
+				for (int term = 0; term < numPairs[dir]; term++)
 					if ((migrated & 1 << dir * 4 << term) != 0) {
 						pairPhase[dir][1][term] = buffer.getUnsignedLEShort();
 						magnitude[dir][1][term] = buffer.getUnsignedLEShort();
@@ -91,13 +95,19 @@ public class SoundFilter {
 						pairPhase[dir][1][term] = pairPhase[dir][0][term];
 						magnitude[dir][1][term] = magnitude[dir][0][term];
 					}
-				}
+
 			}
-			if (migrated != 0 || unity[1] != unity[0]) {
-				soundtrackenvelope.decodeShape(buffer);
-			}
+
+			if (migrated != 0 || unity[1] != unity[0])
+				soundTrackEnvelope.decodeShape(buffer);
+			return;
 		} else {
 			unity[0] = unity[1] = 0;
+			return;
 		}
 	}
+
+
+
+
 }

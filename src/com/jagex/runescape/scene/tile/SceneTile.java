@@ -1,15 +1,20 @@
 package com.jagex.runescape.scene.tile;
-
-import com.jagex.runescape.collection.Node;
 import com.jagex.runescape.scene.CameraAngle;
 import com.jagex.runescape.scene.SceneSpawnRequest;
+import com.jagex.runescape.collection.Node;
 
 public class SceneTile extends Node {
 
-	public int anInt1318;
-	public int anInt1319;
-	public int anInt1320;
-	public int anInt1321;
+	public SceneTile(int i, int j, int k) {
+		anInt1400 = anInt1397 = i;
+		anInt1398 = j;
+		anInt1399 = k;
+	}
+
+	public int anInt1397;
+	public int anInt1398;
+	public int anInt1399;
+	public int anInt1400;
 	public GenericTile genericTile;
 	public ComplexTile complexTile;
 	public Wall wall;
@@ -18,21 +23,15 @@ public class SceneTile extends Node {
 	public CameraAngle cameraAngle;
 	public int sceneSpawnRequestCount;
 	public SceneSpawnRequest[] sceneSpawnRequests = new SceneSpawnRequest[5];
-	public int[] anIntArray1330 = new int[5];
-	public int anInt1331;
-	public int anInt1332;
-	public boolean aBoolean1333;
-	public boolean aBoolean1334;
-	public boolean aBoolean1335;
-	public int anInt1336;
-	public int anInt1337;
-	public int anInt1338;
-	public int anInt1339;
-	public SceneTile sceneTile;
-
-	public SceneTile(int i, int i_0_, int i_1_) {
-		anInt1321 = anInt1318 = i;
-		anInt1319 = i_0_;
-		anInt1320 = i_1_;
-	}
+	public int[] anIntArray1409 = new int[5];
+	public int anInt1410;
+	public int anInt1411;
+	public boolean aBoolean1412;
+	public boolean aBoolean1413;
+	public boolean aBoolean1414;
+	public int anInt1415;
+	public int anInt1416;
+	public int anInt1417;
+	public int anInt1418;
+	public SceneTile aClass50_Sub3_1419;
 }

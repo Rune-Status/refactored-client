@@ -4,26 +4,26 @@ import com.jagex.runescape.net.Buffer;
 
 public class SoundTrackEnvelope {
 
-	private int numPhases;
-	private int[] phaseDuration;
-	private int[] phasePeak;
-	protected int smart;
-	protected int end;
-	protected int form;
-	private int critical;
-	private int phaseIndex;
-	private int step;
-	private int amplitude;
-	private int ticks;
+	public int numPhases;
+	public int phaseDuration[];
+	public int phasePeak[];
+	public int smart;
+	public int end;
+	public int form;
+	public int critical;
+	public int phaseIndex;
+	public int step;
+	public int amplitude;
+	public int ticks;
 
-	public final void decode(Buffer buffer) {
+	public void decode(Buffer buffer) {
 		form = buffer.getUnsignedByte();
 		smart = buffer.getInt();
 		end = buffer.getInt();
 		decodeShape(buffer);
 	}
 
-	public final void decodeShape(Buffer buffer) {
+	public void decodeShape(Buffer buffer) {
 		numPhases = buffer.getUnsignedByte();
 		phaseDuration = new int[numPhases];
 		phasePeak = new int[numPhases];
@@ -31,26 +31,26 @@ public class SoundTrackEnvelope {
 			phaseDuration[phase] = buffer.getUnsignedLEShort();
 			phasePeak[phase] = buffer.getUnsignedLEShort();
 		}
+
 	}
 
-	final void reset() {
+	public void reset() {
 		critical = 0;
 		phaseIndex = 0;
 		step = 0;
 		amplitude = 0;
 		ticks = 0;
+
 	}
 
-	final int step(int period) {
+	public int step(int period) {
 		if (ticks >= critical) {
 			amplitude = phasePeak[phaseIndex++] << 15;
-			if (phaseIndex >= numPhases) {
+			if (phaseIndex >= numPhases)
 				phaseIndex = numPhases - 1;
-			}
-			critical = (int) (phaseDuration[phaseIndex] / 65536.0 * period);
-			if (critical > ticks) {
+			critical = (int) ((phaseDuration[phaseIndex] / 65536D) * period);
+			if (critical > ticks)
 				step = ((phasePeak[phaseIndex] << 15) - amplitude) / (critical - ticks);
-			}
 		}
 		amplitude += step;
 		ticks++;
